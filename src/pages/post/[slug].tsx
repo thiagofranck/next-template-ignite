@@ -1,8 +1,10 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
 import { RichText } from 'prismic-dom';
 import React from 'react';
 import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import Header from '../../components/Header';
+import Prismic from '@prismicio/client';
 
 import { getPrismicClient } from '../../services/prismic';
 
@@ -30,7 +32,14 @@ interface PostProps {
   post: Post;
 }
 
-export default function Post({ post }: PostProps) {
+export default function Post({ post }: PostProps): JSX.Element {
+
+  const router = useRouter();
+
+  if(router.isFallback) {
+    return <h1>Carregando ...</h1>;
+  }
+
   return (
     <>
       <Header />
@@ -73,15 +82,25 @@ export default function Post({ post }: PostProps) {
   );
 }
 
-export const getStaticPaths: GetStaticProps = async () => {
-  //   const prismic = getPrismicClient();
-  //   const posts = await prismic.query(TODO);
+export const getStaticPaths: GetStaticPaths = async () => {
+  const prismic = getPrismicClient();
+  const posts = await prismic.query([
+    Prismic.Predicates.at('document.type', 'posts'),
+  ]);
+
+  const paths = posts.results.map(post => {
+    return {
+      params: {
+        slug: post.uid,
+      },
+    };
+  });
 
   return {
-    paths: [],
+    paths,
     fallback: true,
   };
-};
+}
 
 export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
@@ -112,4 +131,4 @@ export const getStaticProps: GetStaticProps = async context => {
       post,
     },
   };
-};
+}
