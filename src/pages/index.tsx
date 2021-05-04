@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import ptBR from 'date-fns/locale/pt-BR';
 import Link from 'next/link';
 import { ReactElement, useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
